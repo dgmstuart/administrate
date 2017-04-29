@@ -80,6 +80,18 @@ module Administrate
       attribute_includes(show_page_attributes)
     end
 
+    def prepare_resource_for_display(resource)
+      respond_to?(:decorate_resource) ? decorate_resource(resource) : resource
+    end
+
+    def prepare_collection_for_display(resources)
+      if respond_to?(:decorate_resource)
+        resources.map { |resource| decorate_resource(resource) }
+      else
+        resources
+      end
+    end
+
     private
 
     def attribute_not_found_message(attr)

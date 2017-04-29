@@ -27,6 +27,10 @@ module Administrate
         { key => order.order_params_for(attr) }
       end
 
+      def resources
+        dashboard.prepare_collection_for_display(options[:resources])
+      end
+
       private
 
       def order

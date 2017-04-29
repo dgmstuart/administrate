@@ -9,13 +9,14 @@ module Administrate
                                            search_term).run
       resources = apply_collection_includes(resources)
       resources = order.apply(resources)
-      resources = resources.page(params[:_page]).per(records_per_page)
-      page = Administrate::Page::Collection.new(dashboard, order: order)
-
+      paginated_resources = resources.page(params[:_page]).per(records_per_page)
+      page = Administrate::Page::Collection.new(dashboard,
+                                                order: order,
+                                                resources: paginated_resources)
       render locals: {
-        resources: resources,
-        search_term: search_term,
         page: page,
+        pagination_options: paginated_resources,
+        search_term: search_term,
         show_search_bar: show_search_bar?,
       }
     end

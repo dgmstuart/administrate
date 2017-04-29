@@ -23,14 +23,13 @@ from the associated resource class's dashboard.
   <% page_number = params.fetch(field.name, {}).fetch(:page, nil) %>
   <%= render(
     "collection",
-    collection_presenter: field.associated_collection(order),
+    collection_presenter: field.associated_collection(page_number, order),
     collection_field_name: field.name,
     page: page,
-    resources: field.resources(page_number, order),
     table_title: field.name,
   ) %>
   <% if field.more_than_limit? %>
-    <%= paginate field.resources(page_number), param_name: "#{field.name}[page]" %>
+    <%= paginate field.pagination_options(page_number), param_name: "#{field.name}[page]" %>
   <% end %>
 
 <% else %>

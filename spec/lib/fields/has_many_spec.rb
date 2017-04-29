@@ -34,14 +34,17 @@ describe Administrate::Field::HasMany do
 
   describe "class_name option" do
     it "determines what dashboard is used to present the association" do
+      create_list(:customer, 2)
       begin
         FooDashboard = Class.new
-        dashboard_double = double(collection_attributes: [])
+        dashboard_double = double(collection_attributes: [],
+                                  collection_includes: [],
+                                  prepare_collection_for_display: [])
         allow(FooDashboard).to receive(:new).and_return(dashboard_double)
 
         association = Administrate::Field::HasMany.
           with_options(class_name: "Foo")
-        field = association.new(:customers, [], :show)
+        field = association.new(:customers, Customer.all, :show)
         collection = field.associated_collection
         attributes = collection.attribute_names
 
@@ -181,6 +184,19 @@ describe Administrate::Field::HasMany do
 
         expect(field.resources.map(&:id)).to eq correct_order.map(&:id)
         expect(field.resources.map(&:id)).to_not eq reversed_order
+      end
+    end
+
+    context "when dashboard of associated resource has decorator method" do
+      it "returns decorated resources" do
+        order = FactoryBot.create(:order, address_city: "San Francisco", address_state: "CA")
+        customer = FactoryBot.create(:customer, orders: [order])
+        resources = customer.orders
+
+        association = Administrate::Field::HasMany
+        field = association.new(:orders, resources, :show)
+
+        expect(field.resources.first.address).to eq("San Francisco, California")
       end
     end
   end
